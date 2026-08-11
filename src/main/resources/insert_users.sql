@@ -1,0 +1,19 @@
+INSERT INTO users (
+    id,
+    username,
+    password,
+    role
+)
+VALUES
+(
+    1,
+    'admin',
+    '$2a$12$f3KNCyX3p5cxLu4aRdhOzOCGZp.aYIKJ2F1jVlGIBZdLk8q4RELrO',
+    'ADMIN'
+),
+(
+    2,
+    'user',
+    '$2a$12$f3KNCyX3p5cxLu4aRdhOzOCGZp.aYIKJ2F1jVlGIBZdLk8q4RELrO',
+    'USER'
+);
