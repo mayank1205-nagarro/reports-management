@@ -87,7 +87,7 @@ public class ReportController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Export reports to Excel",
-            description = "Downloads multiple reports as an XLSX file. "
+            description = "Admin can download multiple reports as an XLSX file. "
                     + "Optional filters can be applied by status or department."
     )
     @ApiResponses({
