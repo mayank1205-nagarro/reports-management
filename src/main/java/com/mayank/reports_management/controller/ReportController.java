@@ -37,22 +37,94 @@ public class ReportController {
     private final ExcelExportService excelExportService;
 
     @PostMapping
+    @Operation(
+            summary = "Create a report",
+            description = "Creates a new report and records the authenticated user as the creator."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Report created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid report details"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public Report createReport(
             @Valid @RequestBody CreateReportRequest request, Authentication authentication) {
+
         String username = authentication.getName();
 
         return reportService.createReport(request, username);
     }
 
     @PostMapping("/assign")
+    @Operation(
+            summary = "Assign a report",
+            description = "Assigns an existing report to a predefined department and records the authenticated user."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Report assigned successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid assignment details"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Report or department not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public Report assignReport(
             @Valid @RequestBody AssignReportRequest request, Authentication authentication) {
+
         String username = authentication.getName();
 
         return reportService.assignReport(request, username);
     }
 
     @GetMapping("/{reportId}")
+    @Operation(
+            summary = "Get a report by ID",
+            description = "Retrieves a single report using the report ID."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Report found"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Report not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public Report getReportById(
             @PathVariable String reportId) {
 
@@ -60,11 +132,48 @@ public class ReportController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Get all reports",
+            description = "Retrieves all reports available to the authenticated user."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reports retrieved successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public List<Report> getAllReports() {
 
         return reportService.getAllReports();
     }
 
+    @Operation(
+            summary = "Search reports",
+            description = "Users can search reports "
+                    + "Optional filters can be applied for reportId, fromDate and toDate."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "search response generated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Filter parameters incorrect"
+            )
+    })
     @GetMapping("/search")
     public List<Report> searchReports(
             @RequestParam(required = false) String reportId,
@@ -77,7 +186,7 @@ public class ReportController {
             @DateTimeFormat(pattern = "yyyy-MM-dd")
             LocalDate toDate) {
 
-        return reportService.filterReports(
+        return reportService.searchReports(
                 reportId,
                 fromDate,
                 toDate);

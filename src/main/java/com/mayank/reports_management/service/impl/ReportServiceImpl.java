@@ -11,10 +11,15 @@ import com.mayank.reports_management.repository.ReportHistoryRepository;
 import com.mayank.reports_management.repository.ReportRepository;
 import com.mayank.reports_management.service.ReportService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +31,8 @@ public class ReportServiceImpl implements ReportService {
     private final DepartmentRepository departmentRepository;
 
     private final ReportHistoryRepository historyRepository;
+
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public Report createReport(CreateReportRequest request, String username) {
@@ -120,6 +127,74 @@ public class ReportServiceImpl implements ReportService {
         }
 
         return reportRepository.findAll();
+    }
+
+    @Override
+    public List<Report> searchReports(
+            String reportId,
+            LocalDate fromDate,
+            LocalDate toDate) {
+
+        if (fromDate != null
+                && toDate == null) {
+            throw new IllegalArgumentException(
+                    "toDate is required");
+        }
+
+        if (fromDate == null
+                && toDate != null) {
+            throw new IllegalArgumentException(
+                    "fromDate is required");
+        }
+
+        if (fromDate != null
+                && fromDate.isAfter(toDate)) {
+            throw new IllegalArgumentException(
+                    "fromDate cannot be after toDate");
+        }
+
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        if (reportId != null
+                && !reportId.isBlank()) {
+
+            criteriaList.add(
+                    Criteria.where("reportId")
+                            .is(reportId));
+        }
+
+        if (fromDate != null) {
+
+            LocalDateTime start =
+                    fromDate.atStartOfDay();
+
+            LocalDateTime end =
+                    toDate.atTime(
+                            23,
+                            59,
+                            59,
+                            999999999);
+
+            criteriaList.add(
+                    Criteria.where("createdDate")
+                            .gte(start)
+                            .lte(end));
+        }
+
+        Query query = new Query();
+
+        if (!criteriaList.isEmpty()) {
+
+            query.addCriteria(
+                    new Criteria()
+                        .andOperator(
+                        criteriaList.toArray(
+                        new Criteria[0])));
+        }
+
+        return mongoTemplate.find(
+                query,
+                Report.class);
     }
 
     @Override

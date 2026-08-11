@@ -4,7 +4,11 @@ import com.mayank.reports_management.dto.request.DepartmentRequest;
 import com.mayank.reports_management.entity.Department;
 import com.mayank.reports_management.service.DepartmentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,14 +29,62 @@ public class DepartmentController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Create a department",
+            description = "Creates a new department. Only ADMIN users can access this API."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Department created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid department details"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Only ADMIN users can create departments"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Department already exists"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public Department createDepartment(
-            @RequestBody DepartmentRequest request) {
+            @Valid @RequestBody DepartmentRequest request) {
 
         return departmentService.createDepartment(
                 request.getName());
     }
 
     @GetMapping
+    @Operation(
+            summary = "Get all departments",
+            description = "Returns all predefined departments available for report assignment."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Departments fetched successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication token is missing or invalid"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error"
+            )
+    })
     public List<Department> getAllDepartments() {
 
         return departmentService.getAllDepartments();

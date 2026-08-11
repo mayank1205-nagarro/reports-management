@@ -25,4 +25,9 @@ public interface ReportService {
             String reportId,
             LocalDate fromDate,
             LocalDate toDate);
+            
+    List<Report> searchReports(
+        String reportId,
+        LocalDate fromDate,
+        LocalDate toDate);
 }
