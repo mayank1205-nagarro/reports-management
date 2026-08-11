@@ -15,4 +15,8 @@ public interface ReportRepository
     List<Report> findByCreatedDateBetween(
             LocalDateTime fromDate,
             LocalDateTime toDate);
+
+    List<Report> findByStatus(String status);
+
+    List<Report> findByDepartmentId(Long departmentId);
 }
